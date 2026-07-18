@@ -89,7 +89,6 @@ def _run_masscan(target: str, ports: str, rate: int) -> list[dict]:
                 f"--rate={rate}",
                 "--output-format", "json",
                 "-oJ", out_path,
-                "--wait", "3",
             ],
             capture_output=True,
             timeout=600,
