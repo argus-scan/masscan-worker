@@ -97,7 +97,20 @@ def _run_masscan(target: str, ports: str, rate: int) -> list[dict]:
         raw = Path(out_path).read_text().strip()
         if not raw or raw in ("[]", ""):
             return []
-        data = json.loads(raw)
+        if not raw.endswith("]"):
+            raw = raw.rstrip(",").rstrip() + "]"
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError:
+            data = []
+            for line in raw.splitlines():
+                line = line.strip().rstrip(",")
+                if line in ("{", "}", "[", "]", ""):
+                    continue
+                try:
+                    data.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
         results = []
         for entry in data:
             ip = entry.get("ip")
